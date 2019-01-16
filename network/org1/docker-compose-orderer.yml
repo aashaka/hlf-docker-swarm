@@ -44,8 +44,6 @@ services:
             - ORDERER_TLS_CLIENTCERT_FILE=/var/hyperledger/users/Admin@example.com/tls/client.crt
             - ORDERER_TLS_CLIENTKEY_FILE=/var/hyperledger/users/Admin@example.com/tls/client.key
             - ORDERER_HOST=orderer0.example.com
-            - CONFIGTX_ORDERER_ORDERERTYPE=solo
-            - ORDERER_GENERAL_GENESISPROFILE=SecureKafka
             - ORDERER_ABSOLUTEMAXBYTES=10MB
             - ORDERER_PREFERREDMAXBYTES=512KB
         ports:

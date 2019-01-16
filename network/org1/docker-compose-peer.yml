@@ -169,8 +169,8 @@ services:
             - /var/run/:/host/var/run/
             # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
             # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls:/var/hyperledger/tls
+            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/msp:/var/hyperledger/msp
+            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/tls:/var/hyperledger/tls
             - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
             - /var/mynetwork/certs/config/:/var/hyperledger/config
         command: peer node start
@@ -229,8 +229,8 @@ services:
             - /var/run/:/host/var/run/
             # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
             # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls:/var/hyperledger/tls
+            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/msp:/var/hyperledger/msp
+            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/tls:/var/hyperledger/tls
             - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
             - /var/mynetwork/certs/config/:/var/hyperledger/config
         command: peer node start
