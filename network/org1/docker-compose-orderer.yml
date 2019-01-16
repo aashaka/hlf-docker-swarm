@@ -17,7 +17,7 @@ services:
                 max_attempts: 3
             placement:
                 constraints:
-                    - node.hostname == peer-3
+                    - node.hostname == orderer0
         image: hyperledger/fabric-orderer:x86_64-1.1.0
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
         command: orderer
@@ -44,11 +44,7 @@ services:
             - ORDERER_TLS_CLIENTCERT_FILE=/var/hyperledger/users/Admin@example.com/tls/client.crt
             - ORDERER_TLS_CLIENTKEY_FILE=/var/hyperledger/users/Admin@example.com/tls/client.key
             - ORDERER_HOST=orderer0.example.com
-            - CONFIGTX_ORDERER_ORDERERTYPE=kafka
-            - CONFIGTX_ORDERER_KAFKA_BROKERS=[kafka0:9092,kafka1:9092,kafka2:9092,kafka3:9092]
-            - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
-            - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
-            - ORDERER_KAFKA_VERBOSE=true
+            - CONFIGTX_ORDERER_ORDERERTYPE=solo
             - ORDERER_GENERAL_GENESISPROFILE=SecureKafka
             - ORDERER_ABSOLUTEMAXBYTES=10MB
             - ORDERER_PREFERREDMAXBYTES=512KB
