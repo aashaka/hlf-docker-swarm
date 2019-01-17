@@ -2,7 +2,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/chainHero/heroes-service/web/controllers"
+	"github.com/hyperledger/hlf-docker-swarm/web/controllers"
 	"net/http"
 )
 
