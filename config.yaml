@@ -170,7 +170,7 @@ channels:
 #
 organizations:
   org1:
-    mspid: org1.example.com
+    mspid: Org1MSP
     cryptoPath: peerOrganizations/org1.example.com/users/{userName}@org1.example.com/msp
     peers:
       - peer0.org1.example.com
