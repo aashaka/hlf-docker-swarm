@@ -193,7 +193,7 @@ organizations:
 #
 orderers:
   orderer0.example.com:
-    url: localhost:7050
+    url: orderer0:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
