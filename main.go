@@ -19,9 +19,9 @@ func main() {
 		ChannelConfig: os.Getenv("GOPATH") + "/src/github.com/hyperledger/hlf-docker-swarm/network/config/mychannel.tx",
 
 		// Chaincode parameters
-		ChainCodeID:     "simple",
+		ChainCodeID:     "hlf-docker-swarm",
 		ChaincodeGoPath: os.Getenv("GOPATH"),
-		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincodes/",
+		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincode/",
 		OrgAdmin:        "Admin",
 		OrgName:         "org1",
 		ConfigFile:      "config.yaml",

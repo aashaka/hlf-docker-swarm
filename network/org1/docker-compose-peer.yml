@@ -33,6 +33,9 @@ services:
             - CORE_LOGGING_LEVEL=DEBUG
             - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
             - CORE_LOGGING_MSP=DEBUG
+            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+            - CORE_CHAINCODE_LOGGING_SHIM=debug
             # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             # TLS settings
             - CORE_PEER_TLS_ENABLED=true
@@ -91,6 +94,9 @@ services:
             - CORE_LOGGING_LEVEL=DEBUG
             - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
             - CORE_LOGGING_MSP=DEBUG
+            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+            - CORE_CHAINCODE_LOGGING_SHIM=debug
             # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             # TLS settings
             - CORE_PEER_TLS_ENABLED=true
@@ -153,6 +159,9 @@ services:
             - CORE_LOGGING_LEVEL=DEBUG
             - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
             - CORE_LOGGING_MSP=DEBUG
+            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+            - CORE_CHAINCODE_LOGGING_SHIM=debug
             # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             # TLS settings
             - CORE_PEER_TLS_ENABLED=true
