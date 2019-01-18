@@ -20,7 +20,6 @@ services:
                     - node.hostname == peer1
         image: hyperledger/fabric-peer:x86_64-1.1.0
         hostname: peer0.org1.example.com
-        name: peer0.org1.example.com
         environment:
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
             - CORE_PEER_NETWORKID=skcript
@@ -78,7 +77,6 @@ services:
                     - node.hostname == peer2
         image: hyperledger/fabric-peer:x86_64-1.1.0
         hostname: peer1.org1.example.com
-        name: peer1.org1.example.com
         environment:
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
             - CORE_PEER_NETWORKID=skcript
@@ -140,7 +138,6 @@ services:
                     - node.hostname == peer3
         image: hyperledger/fabric-peer:x86_64-1.1.0
         hostname: peer2.org1.example.com
-        name: peer2.org1.example.com
         environment:
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
             - CORE_PEER_NETWORKID=skcript
