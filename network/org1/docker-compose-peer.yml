@@ -56,7 +56,8 @@ services:
         command: peer node start
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         depends_on:
-            - couchdb0
+            - couchdb0_org1
+            - orderer_org1
         ports:
             - 7051:7051
             - 7053:7053
@@ -115,7 +116,8 @@ services:
         command: peer node start
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         depends_on:
-            - couchdb0
+            - couchdb1_org1
+            - orderer_org1
         ports:
           - 8051:7051
           - 8053:7053
@@ -176,7 +178,8 @@ services:
         command: peer node start
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         depends_on:
-            - couchdb0
+            - couchdb2_org1
+            - orderer_org1
         ports:
           - 9051:7051
           - 9053:7053
