@@ -36,20 +36,21 @@ services:
             - CORE_VM_DOCKER_ATTACHSTDOUT=true
             - CORE_CHAINCODE_LOGGING_LEVEL=debug
             - CORE_CHAINCODE_LOGGING_SHIM=debug
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             # TLS settings
             - CORE_PEER_TLS_ENABLED=true
             - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
             - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
             - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
             - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=peer0.org1.example.com:7052
+            - CORE_PEER_CHAINCODELISTENADDRESS=localhost:7052
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
             - CORE_PEER_ID=peer0.org1.example.com
             - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
             - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
             - CORE_PEER_LOCALMSPID=Org1MSP
-            - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
         volumes:
             - /var/run/:/host/var/run/
             - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/msp:/var/hyperledger/msp
@@ -59,7 +60,7 @@ services:
         command: peer node start
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         depends_on:
-            - couchdb0_org1
+            # - couchdb0_org1
             - orderer_org1
         ports:
             - 7051:7051
@@ -97,7 +98,7 @@ services:
             - CORE_VM_DOCKER_ATTACHSTDOUT=true
             - CORE_CHAINCODE_LOGGING_LEVEL=debug
             - CORE_CHAINCODE_LOGGING_SHIM=debug
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             # TLS settings
             - CORE_PEER_TLS_ENABLED=true
             - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
@@ -105,12 +106,13 @@ services:
             - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
             - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
             - CORE_PEER_CHAINCODELISTENADDRESS=localhost:7052
+            - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
             - CORE_PEER_ID=peer1.org1.example.com
             - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
             - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
             - CORE_PEER_LOCALMSPID=Org1MSP
-            - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
         volumes:
             - /var/run/:/host/var/run/
             # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
@@ -122,7 +124,7 @@ services:
         command: peer node start
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         depends_on:
-            - couchdb1_org1
+            # - couchdb1_org1
             - orderer_org1
         ports:
           - 8051:7051
