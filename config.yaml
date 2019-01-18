@@ -194,7 +194,7 @@ organizations:
 orderers:
   orderer0.example.com:
     url: orderer0:7050
-
+    mspid: OrdererMSP
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
