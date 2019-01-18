@@ -133,11 +133,11 @@ channels:
         ledgerQuery: true
         eventSource: true
 
-      peer2.org1.example.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
+      # peer2.org1.example.com:
+      #   endorsingPeer: true
+      #   chaincodeQuery: true
+      #   ledgerQuery: true
+      #   eventSource: true
 
       # peer3.org1.example.com:
       #   endorsingPeer: true
@@ -261,27 +261,27 @@ peers:
       # Certificate location absolute path
       path: ${GOPATH}/src/github.com/hyperledger/hlf-docker-swarm/network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
 
-  peer2.org1.example.com:
-    # this URL is used to send endorsement and query requests
-    url: peer3:9051
-    # eventUrl is only needed when using eventhub (default is delivery service)
-    eventUrl: peer3:9053
+  # peer2.org1.example.com:
+  #   # this URL is used to send endorsement and query requests
+  #   url: peer3:9051
+  #   # eventUrl is only needed when using eventhub (default is delivery service)
+  #   eventUrl: peer3:9053
 
-    grpcOptions:
-      ssl-target-name-override: peer2.org1.example.com
-      # These parameters should be set in coordination with the keepalive policy on the server,
-      # as incompatible settings can result in closing of connection.
-      # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
-      keep-alive-time: 0s
-      keep-alive-timeout: 20s
-      keep-alive-permit: false
-      fail-fast: false
-      # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
-      allow-insecure: false
+  #   grpcOptions:
+  #     ssl-target-name-override: peer2.org1.example.com
+  #     # These parameters should be set in coordination with the keepalive policy on the server,
+  #     # as incompatible settings can result in closing of connection.
+  #     # When duration of the 'keep-alive-time' is set to 0 or less the keep alive client parameters are disabled
+  #     keep-alive-time: 0s
+  #     keep-alive-timeout: 20s
+  #     keep-alive-permit: false
+  #     fail-fast: false
+  #     # allow-insecure will be taken into consideration if address has no protocol defined, if true then grpc or else grpcs
+  #     allow-insecure: false
 
-    tlsCACerts:
-      # Certificate location absolute path
-      path: ${GOPATH}/src/github.com/hyperledger/hlf-docker-swarm/network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
+  #   tlsCACerts:
+  #     # Certificate location absolute path
+  #     path: ${GOPATH}/src/github.com/hyperledger/hlf-docker-swarm/network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
 
 
   # peer3.org1.example.com:
