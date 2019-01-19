@@ -28,7 +28,7 @@ services:
             # - CORE_PEER_GOSSIP_ORGLEADER=false
             # - CORE_PEER_GOSSIP_USELEADERELECTION=true
             - CORE_PEER_PROFILE_ENABLED=true
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
             - CORE_LOGGING_LEVEL=DEBUG
             - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
@@ -90,7 +90,7 @@ services:
             # - CORE_PEER_GOSSIP_ORGLEADER=false
             # - CORE_PEER_GOSSIP_USELEADERELECTION=true
             - CORE_PEER_PROFILE_ENABLED=true
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
             #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
             - CORE_LOGGING_LEVEL=DEBUG
             - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
