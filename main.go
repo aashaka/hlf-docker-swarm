@@ -54,6 +54,22 @@ func main() {
 		fmt.Printf("Response from the query hello: %s\n", response)
 	}
 
+	// Invoke the chaincode
+	txId, err := fSetup.InvokeHello("chainHero")
+	if err != nil {
+		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txId)
+	}
+
+	// Query again the chaincode
+	response, err = fSetup.QueryHello()
+	if err != nil {
+		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query hello: %s\n", response)
+	}
+
 	// // Launch the web application listening
 	// app := &controllers.Application{
 	// 	Fabric: &fSetup,
