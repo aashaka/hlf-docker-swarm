@@ -4,7 +4,7 @@ Description: A chaincode to used for benchmarking Hyperledger Fabric v1
 Author: Parth Thakkar
 */
 
-package main
+package benchmarker
 
 /*
 Functionality required:

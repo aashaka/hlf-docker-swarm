@@ -21,7 +21,7 @@ func main() {
 		// Chaincode parameters
 		ChainCodeID:     "hlf-docker-swarm",
 		ChaincodeGoPath: os.Getenv("GOPATH"),
-		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincode/",
+		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincodes/",
 		OrgAdmin:        "Admin",
 		OrgName:         "org1",
 		ConfigFile:      "config.yaml",
@@ -47,27 +47,34 @@ func main() {
 	}
 
 		// Query the chaincode
-	response, err := fSetup.QueryHello()
+	response, err := fSetup.InvokeOpen('Alice', 100)
 	if err != nil {
-		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Response from the query hello: %s\n", response)
+		fmt.Printf("Response from the invoke open: %s\n", response)
+	}
+
+	response, err := fSetup.InvokeOpen('Bob', 100)
+	if err != nil {
+		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the invoke open: %s\n", response)
 	}
 
 	// Invoke the chaincode
-	txId, err := fSetup.InvokeHello("chainHero")
+	txId, err := fSetup.InvokeTransfer("Bob", "Alice", 20)
 	if err != nil {
-		fmt.Printf("Unable to invoke hello on the chaincode: %v\n", err)
+		fmt.Printf("Unable to invoke transfer on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Successfully invoke hello, transaction ID: %s\n", txId)
+		fmt.Printf("Successfully invoked transfer, transaction ID: %s\n", txId)
 	}
 
 	// Query again the chaincode
-	response, err = fSetup.QueryHello()
+	response, err = fSetup.InvokeDelete('Bob')
 	if err != nil {
-		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Response from the query hello: %s\n", response)
+		fmt.Printf("Response from the delete: %s\n", response)
 	}
 
 	// // Launch the web application listening
