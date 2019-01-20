@@ -60,7 +60,7 @@ func (setup *FabricSetup) InvokeQuery(value string) (string, error) {
 		return "", fmt.Errorf("failed to open account: %v", err)
 	}
 
-	return string(response.TransactionID), nil
+	return string(response.Payload), nil
 }
 
 // InvokeOpen

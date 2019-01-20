@@ -47,34 +47,46 @@ func main() {
 	}
 
 		// Query the chaincode
-	response, err := fSetup.InvokeOpen("Alice", "100")
+	txId, err := fSetup.InvokeOpen("Alice", "100")
 	if err != nil {
 		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Response from the invoke open: %s\n", response)
+		fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
 	}
 
-	response, err := fSetup.InvokeOpen("Bob", "100")
+	txId, err = fSetup.InvokeOpen("Bob", "100")
 	if err != nil {
 		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Response from the invoke open: %s\n", response)
+		fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
 	}
 
-	// Invoke the chaincode
-	txId, err := fSetup.InvokeTransfer("Bob", "Alice", "20")
+	response, err := fSetup.InvokeQuery("Alice")
+	if err != nil {
+		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query Alice: %s\n", response)
+	}
+
+	response, err = fSetup.InvokeQuery("Bob")
+	if err != nil {
+		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query Bob: %s\n", response)
+	}
+
+	txId, err = fSetup.InvokeTransfer("Bob", "Alice", "20")
 	if err != nil {
 		fmt.Printf("Unable to invoke transfer on the chaincode: %v\n", err)
 	} else {
 		fmt.Printf("Successfully invoked transfer, transaction ID: %s\n", txId)
 	}
 
-	// Query again the chaincode
-	response, err = fSetup.InvokeDelete('Bob')
+	txId, err = fSetup.InvokeDelete("Bob")
 	if err != nil {
 		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Response from the delete: %s\n", response)
+		fmt.Printf("Response from the delete, transaction ID: %s\n", txId)
 	}
 
 	// // Launch the web application listening
