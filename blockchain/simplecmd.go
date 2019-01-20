@@ -29,7 +29,7 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 	defer setup.event.Unregister(reg)
 
 	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3])}, TransientMap: transientDataMap})
+	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: {[]string(args[1], args[2], args[3])}, TransientMap: transientDataMap})
 	if err != nil {
 		return "", fmt.Errorf("failed to open account: %v", err)
 	}
