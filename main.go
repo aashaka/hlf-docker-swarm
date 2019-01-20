@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/hyperledger/hlf-docker-swarm/blockchain"
-	"github.com/hyperledger/hlf-docker-swarm/web"
-	"github.com/hyperledger/hlf-docker-swarm/web/controllers"
+	// "github.com/hyperledger/hlf-docker-swarm/web"
+	// "github.com/hyperledger/hlf-docker-swarm/web/controllers"
 	"os"
 )
 
@@ -46,9 +46,17 @@ func main() {
 		return
 	}
 
-	// Launch the web application listening
-	app := &controllers.Application{
-		Fabric: &fSetup,
+		// Query the chaincode
+	response, err := fSetup.QueryHello()
+	if err != nil {
+		fmt.Printf("Unable to query hello on the chaincode: %v\n", err)
+	} else {
+		fmt.Printf("Response from the query hello: %s\n", response)
 	}
-	web.Serve(app)
+
+	// // Launch the web application listening
+	// app := &controllers.Application{
+	// 	Fabric: &fSetup,
+	// }
+	// web.Serve(app)
 }
