@@ -47,14 +47,14 @@ func main() {
 	}
 
 		// Query the chaincode
-	response, err := fSetup.InvokeOpen('Alice', 100)
+	response, err := fSetup.InvokeOpen("Alice", "100")
 	if err != nil {
 		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
 	} else {
 		fmt.Printf("Response from the invoke open: %s\n", response)
 	}
 
-	response, err := fSetup.InvokeOpen('Bob', 100)
+	response, err := fSetup.InvokeOpen("Bob", "100")
 	if err != nil {
 		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
 	} else {
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	// Invoke the chaincode
-	txId, err := fSetup.InvokeTransfer("Bob", "Alice", 20)
+	txId, err := fSetup.InvokeTransfer("Bob", "Alice", "20")
 	if err != nil {
 		fmt.Printf("Unable to invoke transfer on the chaincode: %v\n", err)
 	} else {
