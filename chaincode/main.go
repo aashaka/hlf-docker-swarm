@@ -27,16 +27,20 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
 
-	if function == "open" {
+	if function != "invoke" {
+		return shim.Error("Unknown function call")
+	}
+
+	if args[0] == "open" {
 		return t.Open(stub, args)
 	}
-	if function == "delete" {
+	if args[0] == "delete" {
 		return t.Delete(stub, args)
 	}
-	if function == "query" {
+	if args[0] == "query" {
 		return t.Query(stub, args)
 	}
-	if function == "transfer" {
+	if args[0] == "transfer" {
 		return t.Transfer(stub, args)
 	}
 
@@ -45,22 +49,22 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 // open an account, should be [open account money]
 func (t *SimpleChaincode) Open(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 2 {
+	if len(args) != 3 {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
 
-	account  := args[0]
+	account  := args[1]
 	money,err := stub.GetState(account)
 	if money != nil {
 		return shim.Error(ERROR_ACCOUNT_EXISTING)
 	}
 
-	_,err = strconv.Atoi(args[1])
+	_,err = strconv.Atoi(args[2])
 	if err != nil {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
 
-	err = stub.PutState(account, []byte(args[1]))
+	err = stub.PutState(account, []byte(args[2]))
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
@@ -71,11 +75,11 @@ func (t *SimpleChaincode) Open(stub shim.ChaincodeStubInterface, args []string) 
 
 // delete an account, should be [delete account]
 func (t *SimpleChaincode) Delete(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
+	if len(args) != 2 {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
 
-	err := stub.DelState(args[0])
+	err := stub.DelState(args[1])
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
@@ -86,11 +90,11 @@ func (t *SimpleChaincode) Delete(stub shim.ChaincodeStubInterface, args []string
 
 // query current money of the account,should be [query accout]
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
+	if len(args) != 2 {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
 
-	money, err := stub.GetState(args[0])
+	money, err := stub.GetState(args[1])
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
@@ -105,16 +109,16 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, args []string)
 
 // transfer money from account1 to account2, should be [transfer account1 account2 money]
 func (t *SimpleChaincode) Transfer(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 3 {
+	if len(args) != 4 {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
-	money, err := strconv.Atoi(args[2])
+	money, err := strconv.Atoi(args[3])
 	if err != nil {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
 
-	moneyBytes1, err1 := stub.GetState(args[0])
-	moneyBytes2, err2 := stub.GetState(args[1])
+	moneyBytes1, err1 := stub.GetState(args[1])
+	moneyBytes2, err2 := stub.GetState(args[2])
 	if err1 != nil || err2 != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
@@ -132,13 +136,13 @@ func (t *SimpleChaincode) Transfer(stub shim.ChaincodeStubInterface, args []stri
 	money1 -= money
 	money2 += money
 
-	err = stub.PutState(args[0], []byte(strconv.Itoa(money1)))
+	err = stub.PutState(args[1], []byte(strconv.Itoa(money1)))
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
 	}
 
-	err = stub.PutState(args[1], []byte(strconv.Itoa(money2)))
+	err = stub.PutState(args[2], []byte(strconv.Itoa(money2)))
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
