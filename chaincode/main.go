@@ -1,306 +1,418 @@
+/*
+File: benchmarker.go
+Description: A chaincode to used for benchmarking Hyperledger Fabric v1
+Author: Parth Thakkar
+*/
+
 package main
 
+/*
+Functionality required:
+1. only read
+2. only write
+3. read followed by write
+amount of read and write would vary..
+amount: size of the value, number of <k,v> pairs..
+for these we can have differernt chaincode functions...
+and need to use GetState, PutState, GetStateByRange, CreateCompositeKey and GetStateByPartialCompositeKeys, etc...
+Further, to use ExecuteQuery() for couchDB we might need to use proper JSON as value so that we can use couchDB selector queries..
+*/
+
+/*
+Functions:
+	- [DONE] ReadRandom(seed int, nKeys int, keySizeLo int, keySizeHi int)
+				- Uses GetState()
+	- [DONE] ReadSequential(start string, end string)
+				- Uses GetStateByRange()
+	- [DONE] ReadByPartialCompositeKey(indexName, attributes)
+				- Uses GetStateByPartialCompositeKey()
+	- [DONE] WriteRandom(seed, nKeys, keySizeLo, keySizeHi, vSzLo, vSzHi, indexName, compKeyAttrs)
+				- Uses PutState() and CreateCompositeKey()
+	- [DONE] WriteAfterReadRandom(seed, nKeys, keySizeLo, keySizeHi, vSzLo, vSzHi, indexName, compKeyAttrs)
+				- Uses GetState(), PutState() and CreateCompositeKey()
+	- [DONE] WriteAfterReadSequential(seed, start, end, valSizeLo, valSizeHi, indexName, compKeyAttrs)
+				- Uses GetStateByRange(), PutState() and CreateCompositeKey()
+	- [DONE] GetHistoryForKey(seed, keySizeLo, keySizeHi)
+				- Uses GetHistoryForKey()
+*/
+
 import (
+	"bytes"
 	"fmt"
+	"math/rand"
+	"reflect"
 	"strconv"
+	"time"
+
+	"strings"
+
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-const ERROR_SYSTEM = "{\"code\":300, \"reason\": \"system error: %s\"}"
-const ERROR_WRONG_FORMAT = "{\"code\":301, \"reason\": \"command format is wrong\"}"
-const ERROR_ACCOUNT_EXISTING = "{\"code\":302, \"reason\": \"account already exists\"}"
-const ERROR_ACCOUNT_ABNORMAL = "{\"code\":303, \"reason\": \"abnormal account\"}"
-const ERROR_MONEY_NOT_ENOUGH = "{\"code\":304, \"reason\": \"account's money is not enough\"}"
-
-
-
-type SimpleChaincode struct {
-
+// BenchmarkerChaincode example simple Chaincode implementation
+type BenchmarkerChaincode struct {
 }
 
-func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	// nothing to do
+// Init initializes chaincode...NOOP as of now.
+func (t *BenchmarkerChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	args := stub.GetStringArgs()
+
+	if len(args) != 1 {
+		return shim.Error(fmt.Sprintf("Incorrect number of arguments. Expecting 1. You gave %+v", args))
+	}
+
 	return shim.Success(nil)
 }
 
-func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+// Invoke sets key/value and sleeps a bit
+func (t *BenchmarkerChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	function, args := stub.GetFunctionAndParameters()
 
-	if function != "invoke" {
-		return shim.Error("Unknown function call")
+	rt := reflect.ValueOf(t)
+	theFunc, ok := rt.Type().MethodByName(function)
+	if !ok {
+		var methods []string
+		for i := 0; i < rt.NumMethod(); i++ {
+			methodName := rt.Type().Method(i).Name
+			if methodName != "Invoke" && methodName != "Init" {
+				methods = append(methods, methodName)
+			}
+		}
+		return shim.Error(fmt.Sprintf("Invalid method name. Supported methods: %+v (%d) methods", methods, rt.NumMethod()-2))
+	}
+	if theFunc.Type.NumIn() != len(args)+2 {
+		return shim.Error(fmt.Sprintf("Expected %d arguments. Got %d.", theFunc.Type.NumIn()-2, len(args)))
+	}
+	in := make([]reflect.Value, theFunc.Type.NumIn())
+	in[0] = reflect.ValueOf(t)
+	in[1] = reflect.ValueOf(stub)
+
+	for i := 2; i < theFunc.Type.NumIn(); i++ {
+		t := theFunc.Type.In(i)
+		arg := args[i-2]
+		if t.Kind() == reflect.Int {
+			x, err := strconv.Atoi(arg)
+			if err != nil {
+				return shim.Error(fmt.Sprintf("Expected argument#%d to be convertable to Int. Got %s.", i-2, arg))
+			}
+			in[i] = reflect.ValueOf(x)
+		} else if t.Kind() == reflect.Bool {
+			x, err := strconv.ParseBool(arg)
+			if err != nil {
+				return shim.Error(fmt.Sprintf("Expected argument#%d to be convertable to Bool. Got %s.", i-2, arg))
+			}
+			in[i] = reflect.ValueOf(x)
+		} else if t.Kind() == reflect.Float64 {
+			x, err := strconv.ParseFloat(arg, 64)
+			if err != nil {
+				return shim.Error(fmt.Sprintf("Expected argument#%d to be convertable to Float64. Got %s.", i-2, arg))
+			}
+			in[i] = reflect.ValueOf(x)
+		} else if t.Kind() == reflect.String {
+			in[i] = reflect.ValueOf(arg)
+		} else {
+			return shim.Error(fmt.Sprintf("Unsupported type %s in chaincode.", t.Kind()))
+		}
 	}
 
-	if args[0] == "open" {
-		return t.Open(stub, args)
-	}
-	if args[0] == "delete" {
-		return t.Delete(stub, args)
-	}
-	if args[0] == "query" {
-		return t.Query(stub, args)
-	}
-	if args[0] == "transfer" {
-		return t.Transfer(stub, args)
-	}
-
-	return shim.Error(ERROR_WRONG_FORMAT)
+	return theFunc.Func.Call(in)[0].Interface().(pb.Response)
 }
 
-// open an account, should be [open account money]
-func (t *SimpleChaincode) Open(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 3 {
-		return shim.Error(ERROR_WRONG_FORMAT)
-	}
+// ReadRandom reads nKeys randomly given keySizeLo and keySizeHi and the seed value.
+func (t *BenchmarkerChaincode) ReadRandom(stub shim.ChaincodeStubInterface, seed, nKeys, keySizeLo, keySizeHi int) pb.Response {
+	var (
+		vals []Value
+		km   NoopKeyMapper
+	)
+	keys := km.GetKeys(seed, nKeys, keySizeLo, keySizeHi)
+	for _, key := range keys {
+		bval, err := stub.GetState(key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
 
-	account  := args[1]
-	money,err := stub.GetState(account)
-	if money != nil {
-		return shim.Error(ERROR_ACCOUNT_EXISTING)
+		var val RandomStringValue
+		val.SetKey(key)
+		val.Parse(string(bval))
+		vals = append(vals, &val)
 	}
+	return shim.Success([]byte(MakeJSONArray(vals)))
+}
 
-	_,err = strconv.Atoi(args[2])
+// ReadSequential reads nKeys sequentially between start and end
+func (t *BenchmarkerChaincode) ReadSequential(stub shim.ChaincodeStubInterface, start, end string) pb.Response {
+	var (
+		vals []Value
+	)
+
+	resultsIterator, err := stub.GetStateByRange(start, end)
 	if err != nil {
-		return shim.Error(ERROR_WRONG_FORMAT)
+		return shim.Error(err.Error())
+	}
+	defer resultsIterator.Close()
+
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		var val RandomStringValue
+		val.SetKey(queryResponse.Key)
+		val.Parse(string(queryResponse.Value))
+		vals = append(vals, &val)
 	}
 
-	err = stub.PutState(account, []byte(args[2]))
+	return shim.Success([]byte(MakeJSONArray(vals)))
+}
+
+// ReadByPartialCompositeKey reads all items belonging to a particular partial composite key
+func (t *BenchmarkerChaincode) ReadByPartialCompositeKey(stub shim.ChaincodeStubInterface, indexName string, indexValues string) pb.Response {
+	var (
+		vals []Value
+	)
+
+	indexValuesSlice := strings.Split(indexValues, ",")
+	resultsIterator, err := stub.GetStateByPartialCompositeKey(indexName+"~id", indexValuesSlice)
 	if err != nil {
-		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
-		return shim.Error(s)
+		return shim.Error(err.Error())
+	}
+	defer resultsIterator.Close()
+
+	for i := 0; resultsIterator.HasNext(); i++ {
+		responseRange, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		// get the values from the composite key
+		_, compositeKeyParts, err := stub.SplitCompositeKey(responseRange.Key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		key := compositeKeyParts[len(compositeKeyParts)-1]
+
+		bval, err := stub.GetState(key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		var val RandomStringValue
+		val.SetKey(key)
+		val.Parse(string(bval))
+		vals = append(vals, &val)
 	}
 
-	err = stub.SetEvent("eventOpen", []byte{})
+	return shim.Success([]byte(MakeJSONArray(vals)))
+}
+
+// getIndexValueSpace returns a 2D slice of strings, ith child-slice is a set of valid
+// values for the ith index.
+// indexValues is expected to be a string with n line for n indexes,
+// each line has comma separated list of valid values for that index
+func (t *BenchmarkerChaincode) getIndexValueSpace(indexValues string) [][]string {
+	values := strings.Split(indexValues, "\n")
+	var indexValueSpace [][]string
+	for i := range values {
+		indexValueSpace = append(indexValueSpace, strings.Split(values[i], ","))
+	}
+	return indexValueSpace
+}
+
+// updateIndex creates a composite key randomly using the indexValueSpace and indexName, and stores it.
+// it does not delete previously associated composite key because the keys are generated randomly,
+// so there's no way in which we can find them out.
+func (t *BenchmarkerChaincode) updateIndex(stub shim.ChaincodeStubInterface, key, indexName string, indexValueSpace [][]string) error {
+	if indexName == "" {
+		return nil
+	}
+
+	var indexValues []string
+	for _, validValues := range indexValueSpace {
+		choice := rand.Intn(len(validValues))
+		indexValues = append(indexValues, validValues[choice])
+	}
+
+	indexKey, err := stub.CreateCompositeKey(indexName+"~id", append(indexValues, key))
+	if err != nil {
+		return err
+	}
+
+	value := []byte{0x00}
+	if err := stub.PutState(indexKey, value); err != nil {
+		return err
+	}
+	fmt.Printf("Set composite key '%s' to '%s' for key '%s'\n", indexKey, value, key)
+
+	return nil
+}
+
+// WriteRandom writes nKeys randomly given keySizeLo, keySizeHi, valSizeLo, valSizeHi and the seed value.
+func (t *BenchmarkerChaincode) WriteRandom(stub shim.ChaincodeStubInterface, seed, nKeys, keySizeLo, keySizeHi, valSizeLo, valSizeHi int, indexName, indexValues string) pb.Response {
+	var (
+		km              NoopKeyMapper
+		val             RandomStringValue
+		indexValueSpace = t.getIndexValueSpace(indexValues)
+	)
+
+	val.Init(seed)
+	keys := km.GetKeys(seed, nKeys, keySizeLo, keySizeHi)
+
+	for _, key := range keys {
+		val.Generate(key, valSizeLo, valSizeHi)
+		fmt.Printf("WriteRandom: Putting '%s':'%s'\n", key, val.SerializeForState())
+
+		err := stub.PutState(key, []byte(val.SerializeForState()))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		t.updateIndex(stub, key, indexName, indexValueSpace)
+	}
+
+	err = stub.SetEvent("eventWR", []byte{})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 
-	return shim.Success(nil)
+	return shim.Success([]byte("OK"))
 }
 
-// delete an account, should be [delete account]
-func (t *SimpleChaincode) Delete(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 2 {
-		return shim.Error(ERROR_WRONG_FORMAT)
-	}
+// WriteAfterReadRandom reads nKeys randomly given keySizeLo and keySizeHi and the seed value, and updates them.
+func (t *BenchmarkerChaincode) WriteAfterReadRandom(stub shim.ChaincodeStubInterface, seed, nKeys, keySizeLo, keySizeHi, valSizeLo, valSizeHi int, indexName string, indexValues string) pb.Response {
+	var (
+		km              NoopKeyMapper
+		val             RandomStringValue
+		indexValueSpace = t.getIndexValueSpace(indexValues)
+	)
 
-	err := stub.DelState(args[1])
-	if err != nil {
-		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
-		return shim.Error(s)
-	}
+	val.Init(seed)
+	keys := km.GetKeys(seed, nKeys, keySizeLo, keySizeHi)
 
-	err = stub.SetEvent("eventDelete", []byte{})
+	for _, key := range keys {
+		// ignore the old value. We just want to call GetState
+		oldVal, err := stub.GetState(key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		val.Generate(key, valSizeLo, valSizeHi)
+		fmt.Printf("WriterAfterReadRandom: Updating '%s' from '%s' to '%s'\n", key, oldVal, val.SerializeForState())
+
+		err = stub.PutState(key, []byte(val.SerializeForState()))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		t.updateIndex(stub, key, indexName, indexValueSpace)
+	}
+	return shim.Success([]byte("OK"))
+}
+
+// WriteAfterReadSequential reads nKeys sequentially between start and end
+func (t *BenchmarkerChaincode) WriteAfterReadSequential(stub shim.ChaincodeStubInterface, seed int, start, end string, valSizeLo, valSizeHi int, indexName string, indexValues string) pb.Response {
+	var (
+		val             RandomStringValue
+		indexValueSpace = t.getIndexValueSpace(indexValues)
+	)
+
+	resultsIterator, err := stub.GetStateByRange(start, end)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+	defer resultsIterator.Close()
 
-	return shim.Success(nil)
+	val.Init(seed)
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		val.Generate(queryResponse.Key, valSizeLo, valSizeHi)
+		fmt.Printf("WriterAfterReadSequential: Updating '%s' from '%s' to '%s'\n",
+			queryResponse.Key,
+			queryResponse.Value,
+			val.SerializeForState(),
+		)
+
+		err = stub.PutState(queryResponse.Key, []byte(val.SerializeForState()))
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		t.updateIndex(stub, queryResponse.Key, indexName, indexValueSpace)
+	}
+
+	return shim.Success([]byte("OK"))
 }
 
-// query current money of the account,should be [query accout]
-func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 2 {
-		return shim.Error(ERROR_WRONG_FORMAT)
-	}
+// GetHistoryForKey gets history of a random key given keySizeLo and keySizeHi and the seed value.
+func (t *BenchmarkerChaincode) GetHistoryForKey(stub shim.ChaincodeStubInterface, seed, keySizeLo, keySizeHi int) pb.Response {
+	var (
+		km NoopKeyMapper
+	)
 
-	money, err := stub.GetState(args[1])
-	if err != nil {
-		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
-		return shim.Error(s)
-	}
+	key := km.GetKeys(seed, 1, keySizeLo, keySizeHi)[0]
 
-	if money == nil {
-		return shim.Error(ERROR_ACCOUNT_ABNORMAL)
-	}
-
-	return shim.Success(money)
-}
-
-// transfer money from account1 to account2, should be [transfer account1 account2 money]
-func (t *SimpleChaincode) Transfer(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 4 {
-		return shim.Error(ERROR_WRONG_FORMAT)
-	}
-	money, err := strconv.Atoi(args[3])
-	if err != nil {
-		return shim.Error(ERROR_WRONG_FORMAT)
-	}
-
-	moneyBytes1, err1 := stub.GetState(args[1])
-	moneyBytes2, err2 := stub.GetState(args[2])
-	if err1 != nil || err2 != nil {
-		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
-		return shim.Error(s)
-	}
-	if moneyBytes1 == nil || moneyBytes2 == nil {
-		return shim.Error(ERROR_ACCOUNT_ABNORMAL)
-	}
-
-	money1, _ := strconv.Atoi(string(moneyBytes1))
-	money2, _ := strconv.Atoi(string(moneyBytes2))
-	if money1 < money {
-		return shim.Error(ERROR_MONEY_NOT_ENOUGH)
-	}
-
-	money1 -= money
-	money2 += money
-
-	err = stub.PutState(args[1], []byte(strconv.Itoa(money1)))
-	if err != nil {
-		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
-		return shim.Error(s)
-	}
-
-	err = stub.PutState(args[2], []byte(strconv.Itoa(money2)))
-	if err != nil {
-		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
-		return shim.Error(s)
-	}
-
-	err = stub.SetEvent("eventTransfer", []byte{})
+	resultsIterator, err := stub.GetHistoryForKey(key)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
+	defer resultsIterator.Close()
 
-	return shim.Success(nil)
-}
+	fmt.Printf("GetHistoryForKey: Getting history for key '%s'\n", key)
 
+	// buffer is a JSON array containing historic values for the marble
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
 
-func  main()  {
-	err := shim.Start(new(SimpleChaincode))
-	if err != nil {
-		fmt.Printf("Error starting chaincode: %v \n", err)
+	bArrayMemberAlreadyWritten := false
+	for resultsIterator.HasNext() {
+		response, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		// Add a comma before array members, suppress it for the first array member
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
+		}
+		buffer.WriteString("{\"TxId\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(response.TxId)
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"Value\":")
+		// if it was a delete operation on given key, then we need to set the
+		//corresponding value null. Else, we will write the response.Value
+		//as-is (as the Value itself a JSON marble)
+		if response.IsDelete {
+			buffer.WriteString("null")
+		} else {
+			buffer.WriteString(string(response.Value))
+		}
+
+		buffer.WriteString(", \"Timestamp\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(time.Unix(response.Timestamp.Seconds, int64(response.Timestamp.Nanos)).String())
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"IsDelete\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(strconv.FormatBool(response.IsDelete))
+		buffer.WriteString("\"")
+
+		buffer.WriteString("}")
+		bArrayMemberAlreadyWritten = true
 	}
+	buffer.WriteString("]")
 
+	return shim.Success(buffer.Bytes())
 }
 
-
-// // HeroesServiceChaincode implementation of Chaincode
-// type HeroesServiceChaincode struct {
-// }
-
-// // Init of the chaincode
-// // This function is called only one when the chaincode is instantiated.
-// // So the goal is to prepare the ledger to handle future requests.
-// func (t *HeroesServiceChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-// 	fmt.Println("########### HeroesServiceChaincode Init ###########")
-
-// 	// Get the function and arguments from the request
-// 	function, _ := stub.GetFunctionAndParameters()
-
-// 	// Check if the request is the init function
-// 	if function != "init" {
-// 		return shim.Error("Unknown function call")
-// 	}
-
-// 	// Put in the ledger the key/value hello/world
-// 	err := stub.PutState("hello", []byte("world"))
-// 	if err != nil {
-// 		return shim.Error(err.Error())
-// 	}
-
-// 	// Return a successful message
-// 	return shim.Success(nil)
-// }
-
-// // Invoke
-// // All future requests named invoke will arrive here.
-// func (t *HeroesServiceChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-// 	fmt.Println("########### HeroesServiceChaincode Invoke ###########")
-
-// 	// Get the function and arguments from the request
-// 	function, args := stub.GetFunctionAndParameters()
-
-// 	// Check whether it is an invoke request
-// 	if function != "invoke" {
-// 		return shim.Error("Unknown function call")
-// 	}
-
-// 	// Check whether the number of arguments is sufficient
-// 	if len(args) < 1 {
-// 		return shim.Error("The number of arguments is insufficient.")
-// 	}
-
-// 	// In order to manage multiple type of request, we will check the first argument.
-// 	// Here we have one possible argument: query (every query request will read in the ledger without modification)
-// 	if args[0] == "query" {
-// 		return t.query(stub, args)
-// 	}
-
-// 	// The update argument will manage all update in the ledger
-// 	if args[0] == "invoke" {
-// 		return t.invoke(stub, args)
-// 	}
-
-// 	// If the arguments given don’t match any function, we return an error
-// 	return shim.Error("Unknown action, check the first argument")
-// }
-
-// // query
-// // Every readonly functions in the ledger will be here
-// func (t *HeroesServiceChaincode) query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-// 	fmt.Println("########### HeroesServiceChaincode query ###########")
-
-// 	// Check whether the number of arguments is sufficient
-// 	if len(args) < 2 {
-// 		return shim.Error("The number of arguments is insufficient.")
-// 	}
-
-// 	// Like the Invoke function, we manage multiple type of query requests with the second argument.
-// 	// We also have only one possible argument: hello
-// 	if args[1] == "hello" {
-
-// 		// Get the state of the value matching the key hello in the ledger
-// 		state, err := stub.GetState("hello")
-// 		if err != nil {
-// 			return shim.Error("Failed to get state of hello")
-// 		}
-
-// 		// Return this value in response
-// 		return shim.Success(state)
-// 	}
-
-// 	// If the arguments given don’t match any function, we return an error
-// 	return shim.Error("Unknown query action, check the second argument.")
-// }
-
-// // invoke
-// // Every functions that read and write in the ledger will be here
-// func (t *HeroesServiceChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-// 	fmt.Println("########### HeroesServiceChaincode invoke ###########")
-
-// 	if len(args) < 2 {
-// 		return shim.Error("The number of arguments is insufficient.")
-// 	}
-
-// 	// Check if the ledger key is "hello" and process if it is the case. Otherwise it returns an error.
-// 	if args[1] == "hello" && len(args) == 3 {
-
-// 		// Write the new value in the ledger
-// 		err := stub.PutState("hello", []byte(args[2]))
-// 		if err != nil {
-// 			return shim.Error("Failed to update state of hello")
-// 		}
-
-// 		// Notify listeners that an event "eventInvoke" have been executed (check line 19 in the file invoke.go)
-// 		err = stub.SetEvent("eventInvoke", []byte{})
-// 		if err != nil {
-// 			return shim.Error(err.Error())
-// 		}
-
-// 		// Return this value in response
-// 		return shim.Success(nil)
-// 	}
-
-// 	// If the arguments given don’t match any function, we return an error
-// 	return shim.Error("Unknown invoke action, check the second argument.")
-// }
-
-// func main() {
-// 	// Start the chaincode and make it ready for futures requests
-// 	err := shim.Start(new(HeroesServiceChaincode))
-// 	if err != nil {
-// 		fmt.Printf("Error starting Heroes Service chaincode: %s", err)
-// 	}
-// }
+func main() {
+	err := shim.Start(new(BenchmarkerChaincode))
+	if err != nil {
+		fmt.Printf("Error starting Sleeper chaincode: %s", err)
+	}
+}

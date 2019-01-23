@@ -1,4 +1,4 @@
-package benchmarker
+package main
 
 import "bytes"
 

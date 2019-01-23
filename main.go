@@ -33,7 +33,7 @@ func main() {
 		// Chaincode parameters
 		ChainCodeID:     "hlf-docker-swarm",
 		ChaincodeGoPath: os.Getenv("GOPATH"),
-		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincodes/benchmark",
+		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincode",
 		OrgAdmin:        "Admin",
 		OrgName:         "org1",
 		ConfigFile:      "config.yaml",
