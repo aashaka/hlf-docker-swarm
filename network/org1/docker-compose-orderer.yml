@@ -29,7 +29,7 @@ services:
             - ORDERER_GENERAL_ORDERERTYPE=solo
             - ORDERER_RAMLEDGER_HISTORY_SIZE=100
             - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            - ORDERER_GENERAL_LOGLEVEL=debug
+            - FABRIC_LOGGING_SPEC=debug
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
             - ORDERER_GENERAL_GENESISMETHOD=file
             - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/config/genesis.block
