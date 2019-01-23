@@ -8,6 +8,18 @@ import (
 	"os"
 )
 
+func ReadLine(r io.Reader, lineNum int) (line string, lastLine int, err error) {
+  sc := bufio.NewScanner(r)
+  for sc.Scan() {
+      lastLine++
+      if lastLine == lineNum {
+          // you can return sc.Bytes() if you need output in []bytes
+          return sc.Text(), lastLine, sc.Err()
+      }
+  }
+  return line, lastLine, io.EOF
+}
+
 func main() {
 	// Definition of the Fabric SDK properties
 	fSetup := blockchain.FabricSetup{
@@ -21,7 +33,7 @@ func main() {
 		// Chaincode parameters
 		ChainCodeID:     "hlf-docker-swarm",
 		ChaincodeGoPath: os.Getenv("GOPATH"),
-		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincode/",
+		ChaincodePath:   "github.com/hyperledger/hlf-docker-swarm/chaincodes/benchmark",
 		OrgAdmin:        "Admin",
 		OrgName:         "org1",
 		ConfigFile:      "config.yaml",
@@ -46,48 +58,55 @@ func main() {
 		return
 	}
 
+
 		// Query the chaincode
-	txId, err := fSetup.InvokeOpen("Alice", "100")
+	// for i := 0; i < 100; i++ {
+	// 	num := i
+	// 	go func() {
+	// 		txId, err := fSetup.WriteRandom(prng().toString().substr(2,4), "1", "0".repeat(5), "9".repeat(9), "8", "20", "","")
+	// 		if err != nil {
+	// 			fmt.Printf("Unable to open account on the chaincode: %v\n", err)
+	// 		} else {
+	// 			fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
+	// 		}
+	// 	}
+	// }
+	
+
+	elapsed, err := fSetup.WriteRand()
 	if err != nil {
 		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
 	} else {
-		fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
+		fmt.Printf("Response from the write rand received, time taken = %v", elapsed)
 	}
 
-	txId, err = fSetup.InvokeOpen("Bob", "100")
-	if err != nil {
-		fmt.Printf("Unable to open account on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
-	}
+	// response, err := fSetup.InvokeQuery("Alice")
+	// if err != nil {
+	// 	fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
+	// } else {
+	// 	fmt.Printf("Response from the query Alice: %s\n", response)
+	// }
 
-	response, err := fSetup.InvokeQuery("Alice")
-	if err != nil {
-		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Response from the query Alice: %s\n", response)
-	}
+	// response, err = fSetup.InvokeQuery("Bob")
+	// if err != nil {
+	// 	fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
+	// } else {
+	// 	fmt.Printf("Response from the query Bob: %s\n", response)
+	// }
 
-	response, err = fSetup.InvokeQuery("Bob")
-	if err != nil {
-		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Response from the query Bob: %s\n", response)
-	}
+	// txId, err = fSetup.InvokeTransfer("Bob", "Alice", "20")
+	// if err != nil {
+	// 	fmt.Printf("Unable to invoke transfer on the chaincode: %v\n", err)
+	// } else {
+	// 	fmt.Printf("Successfully invoked transfer, transaction ID: %s\n", txId)
+	// }
 
-	txId, err = fSetup.InvokeTransfer("Bob", "Alice", "20")
-	if err != nil {
-		fmt.Printf("Unable to invoke transfer on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Successfully invoked transfer, transaction ID: %s\n", txId)
-	}
-
-	txId, err = fSetup.InvokeDelete("Bob")
-	if err != nil {
-		fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
-	} else {
-		fmt.Printf("Response from the delete, transaction ID: %s\n", txId)
-	}
+	// txId, err = fSetup.InvokeDelete("Bob")
+	// if err != nil {
+	// 	fmt.Printf("Unable to delete account on the chaincode: %v\n", err)
+	// } else {
+	// 	fmt.Printf("Response from the delete, transaction ID: %s\n", txId)
+	// }
 
 	// // Launch the web application listening
 	// app := &controllers.Application{
