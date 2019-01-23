@@ -70,6 +70,11 @@ func (t *SimpleChaincode) Open(stub shim.ChaincodeStubInterface, args []string) 
 		return shim.Error(s)
 	}
 
+	err = stub.SetEvent("eventOpen", []byte{})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
 	return shim.Success(nil)
 }
 
@@ -83,6 +88,11 @@ func (t *SimpleChaincode) Delete(stub shim.ChaincodeStubInterface, args []string
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
+	}
+
+	err = stub.SetEvent("eventDelete", []byte{})
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
 	return shim.Success(nil)
@@ -146,6 +156,11 @@ func (t *SimpleChaincode) Transfer(stub shim.ChaincodeStubInterface, args []stri
 	if err != nil {
 		s := fmt.Sprintf(ERROR_SYSTEM, err.Error())
 		return shim.Error(s)
+	}
+
+	err = stub.SetEvent("eventTransfer", []byte{})
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
 	return shim.Success(nil)
