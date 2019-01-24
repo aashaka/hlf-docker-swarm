@@ -270,7 +270,7 @@ func (t *BenchmarkerChaincode) WriteRandom(stub shim.ChaincodeStubInterface, see
 		t.updateIndex(stub, key, indexName, indexValueSpace)
 	}
 
-	err = stub.SetEvent("eventWR", []byte{})
+	err := stub.SetEvent("eventWR", []byte{})
 	if err != nil {
 		return shim.Error(err.Error())
 	}
