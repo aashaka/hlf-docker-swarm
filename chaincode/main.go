@@ -123,6 +123,7 @@ func (t *SimpleChaincode) Transfer(stub shim.ChaincodeStubInterface, args []stri
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
 	money, err := strconv.Atoi(args[3])
+
 	if err != nil {
 		return shim.Error(ERROR_WRONG_FORMAT)
 	}
