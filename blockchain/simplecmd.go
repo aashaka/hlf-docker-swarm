@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"time"
+	"math/rand"
+	"strconv"
+	"sync"
 )
-
+var numThreads = 200
 // InvokeOpen
 func (setup *FabricSetup) InvokeOpen(account string, value string) (string, error) {
 
@@ -16,33 +19,81 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 	args = append(args, account)
 	args = append(args, value)
 
-	eventID := "eventOpen"
+//	eventID := "eventOpen"
 
 	// Add data that will be visible in the proposal, like a description of the invoke request
 	transientDataMap := make(map[string][]byte)
 	transientDataMap["result"] = []byte("Transient data in open")
 
-	reg, notifier, err := setup.event.RegisterChaincodeEvent(setup.ChainCodeID, eventID)
-	if err != nil {
-		return "", err
+// 	reg, notifier, err := setup.event.RegisterChaincodeEvent(setup.ChainCodeID, eventID)
+// 	if err != nil {
+// 		return "", err
+// 	}
+//	defer setup.event.Unregister(reg)
+	var randNum1 []string
+	var randNum2 []string
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	for k:=0; k<numThreads; k++ {
+		num := strconv.Itoa(r1.Intn(100000))
+		num2 := strconv.Itoa(r1.Intn(100))
+		randNum1 = append(randNum1,num)
+		randNum2 = append(randNum2,num2)
 	}
-	defer setup.event.Unregister(reg)
-
-	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3])}, TransientMap: transientDataMap})
-	if err != nil {
-		return "", fmt.Errorf("failed to open account: %v", err)
+	resch := make(chan channel.Response, numThreads+4)
+	errch := make(chan error, numThreads+4)
+	var able int
+	var unable int
+	var wg sync.WaitGroup
+	start := time.Now()
+	ablech := make(chan int, numThreads+4)
+	unablech := make(chan int, numThreads+4)
+	for i:=0; i<numThreads; i++ {
+		wg.Add(1)
+		j := i
+		go func() {
+			defer wg.Done()
+			// Create a request (proposal) and send it
+			fmt.Println("Sending transaction via client",j)
+//			fmt.Printf("%s: %s",randNum1[j], randNum2[j])
+			response, err := setup.clients[j].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(randNum1[j]), []byte(randNum2[j])}, TransientMap: transientDataMap})
+			if err != nil {
+				errch<-fmt.Errorf("failed to open account: %v", err)
+				unablech<-j
+			} else {
+	//			fmt.Printf("TXID: %v", response.TransactionID)
+				resch<-response
+				ablech<-j
+			}
+		}()
 	}
-
-	// Wait for the result of the submission
-	select {
-	case ccEvent := <-notifier:
-		fmt.Printf("Received CC event: %s\n", ccEvent)
-	case <-time.After(time.Second * 20):
-		return "", fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
+	wg.Wait()
+	t1 := time.Now()
+        elapsed1 := t1.Sub(start)
+        fmt.Printf("Time elapsed1: %v\n",elapsed1)
+	for l := 1; l <= numThreads; l++ {
+		select {
+			case _ = <-ablech:
+				able = able + 1
+		//		fmt.Printf("######## Received response for transaction: %d\n", ind)
+			case _ = <-unablech:
+				unable = unable + 1
+		//		fmt.Printf("######## No response for transaction: %d\n", indn)
+		}
 	}
+        t2 := time.Now()
+        elapsed2 := t2.Sub(start)
+        fmt.Printf("Time elapsed2: %v\n",elapsed2)
+        fmt.Printf(" Able: %d\n Unable: %d\n",able, unable)
+// 	// Wait for the result of the submission
+// 	select {
+// 	case ccEvent := <-notifier:
+// 		fmt.Printf("Received CC event: %s\n", ccEvent)
+// 	case <-time.After(time.Second * 20):
+// 		return "", fmt.Errorf("did NOT receive CC event for eventId(%s)", eventID)
+// 	}
 
-	return string(response.TransactionID), nil
+	return "", nil
 }
 
 // InvokeQuery
@@ -55,7 +106,7 @@ func (setup *FabricSetup) InvokeQuery(value string) (string, error) {
 	args = append(args, value)
 
 	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])} })
+	response, err := setup.clients[0].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])} })
 	if err != nil {
 		return "", fmt.Errorf("failed to open account: %v", err)
 	}
@@ -87,7 +138,7 @@ func (setup *FabricSetup) InvokeTransfer(sender string, receiver string, value s
 	defer setup.event.Unregister(reg)
 
 	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4])}, TransientMap: transientDataMap})
+	response, err := setup.clients[0].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2]), []byte(args[3]), []byte(args[4])}, TransientMap: transientDataMap})
 	if err != nil {
 		return "", fmt.Errorf("failed to open account: %v", err)
 	}
@@ -125,7 +176,7 @@ func (setup *FabricSetup) InvokeDelete(value string) (string, error) {
 	defer setup.event.Unregister(reg)
 
 	// Create a request (proposal) and send it
-	response, err := setup.client.Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}, TransientMap: transientDataMap})
+	response, err := setup.clients[0].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(args[2])}, TransientMap: transientDataMap})
 	if err != nil {
 		return "", fmt.Errorf("failed to open account: %v", err)
 	}

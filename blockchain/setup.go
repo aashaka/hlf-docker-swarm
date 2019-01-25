@@ -15,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var numClients = 200
+
 // FabricSetup implementation
 type FabricSetup struct {
 	ConfigFile      string
@@ -29,7 +31,7 @@ type FabricSetup struct {
 	OrgAdmin        string
 	OrgName         string
 	UserName        string
-	client          *channel.Client
+	clients         []*channel.Client
 	admin           *resmgmt.Client
 	sdk             *fabsdk.FabricSDK
 	event           *event.Client
@@ -118,12 +120,14 @@ func (setup *FabricSetup) InstallAndInstantiateCC() error {
 
 	// Channel client is used to query and execute transactions
 	clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
-	setup.client, err = channel.New(clientContext)
-	if err != nil {
-		return errors.WithMessage(err, "failed to create new channel client")
+	for i:=0 ; i<numClients; i++ {
+		cli, err := channel.New(clientContext)
+		if err != nil {
+			return errors.WithMessage(err, "failed to create new channel client")
+		}
+		setup.clients = append(setup.clients, cli)
+		fmt.Printf("Channel client %d created", i)
 	}
-	fmt.Println("Channel client created")
-
 	// Creation of the client which will enables access to our channel events
 	setup.event, err = event.New(clientContext)
 	if err != nil {
