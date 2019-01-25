@@ -20,11 +20,11 @@ Orderer: &OrdererDefaults
     Addresses:
         - orderer0.example.com:7050
 
-    BatchTimeout: 2s
+    BatchTimeout: 4s
     BatchSize:
-        MaxMessageCount: 10
+        MaxMessageCount: 1000000
         AbsoluteMaxBytes: 99 MB
-        PreferredMaxBytes: 512 KB
+        PreferredMaxBytes: 2 MB
 
     Kafka:
         Brokers:
