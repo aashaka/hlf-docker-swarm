@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var numClients = 200
+var numClients = 48
 
 // FabricSetup implementation
 type FabricSetup struct {

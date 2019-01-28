@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"time"
+	"math"
 	"math/rand"
 	"strconv"
 	"sync"
 )
-var numThreads = 200
+var load = 200
+var numThreads = 48
 // InvokeOpen
 func (setup *FabricSetup) InvokeOpen(account string, value string) (string, error) {
 
@@ -34,44 +36,65 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 	var randNum2 []string
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
-	for k:=0; k<numThreads; k++ {
-		num := strconv.Itoa(r1.Intn(100000))
+	for k:=0; k<load; k++ {
+		num := strconv.Itoa(r1.Intn(10000000))
 		num2 := strconv.Itoa(r1.Intn(100))
 		randNum1 = append(randNum1,num)
 		randNum2 = append(randNum2,num2)
 	}
-	resch := make(chan channel.Response, numThreads+4)
-	errch := make(chan error, numThreads+4)
+///	resch := make(chan channel.Response, load+4)
+///	errch := make(chan error, load+4)
 	var able int
 	var unable int
 	var wg sync.WaitGroup
 	start := time.Now()
-	ablech := make(chan int, numThreads+4)
-	unablech := make(chan int, numThreads+4)
+///	ablech := make(chan int, load+4)
+///	unablech := make(chan int, load+4)
+	chunksz := load/numThreads
+	tx := 0
 	for i:=0; i<numThreads; i++ {
 		wg.Add(1)
 		j := i
 		go func() {
 			defer wg.Done()
-			// Create a request (proposal) and send it
-			fmt.Println("Sending transaction via client",j)
-//			fmt.Printf("%s: %s",randNum1[j], randNum2[j])
-			response, err := setup.clients[j].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(randNum1[j]), []byte(randNum2[j])}, TransientMap: transientDataMap})
-			if err != nil {
-				errch<-fmt.Errorf("failed to open account: %v", err)
-				unablech<-j
-			} else {
-	//			fmt.Printf("TXID: %v", response.TransactionID)
-				resch<-response
-				ablech<-j
+			for tx=j*chunksz; float64(tx)<math.Min(float64((j+1)*chunksz),float64(load)); tx++ {
+				// Create a request (proposal) and send it
+				fmt.Printf("Sending transaction %d via client %d\n",tx,j)
+//				fmt.Printf("%s: %s",randNum1[j], randNum2[j])
+				_, err := setup.clients[j].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(randNum1[tx]), []byte(randNum2[tx])}, TransientMap: transientDataMap})
+				if err != nil {
+///					errch<-fmt.Errorf("failed to open account: %v", err)
+///					unablech<-j
+				} else {
+	//				fmt.Printf("TXID: %v", response.TransactionID)
+///					resch<-response
+///					ablech<-j
+				}
 			}
+/*			if j == numThreads-1 {
+				for ; tx<load; tx++ {
+					// Create a request (proposal) and send it
+	                                fmt.Printf("Sending transaction %d via client %d",tx,j)
+	//                              fmt.Printf("%s: %s",randNum1[j], randNum2[j])
+	                                _, err := setup.clients[j].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(randNum1[tx]), []byte(randNum2[tx])}, TransientMap: transientDataMap})
+	                                if err != nil {
+///	                                        errch<-fmt.Errorf("failed to open account: %v", err)
+///	                                        unablech<-j
+	                                } else {
+	        //                              fmt.Printf("TXID: %v", response.TransactionID)
+///	                                        resch<-response
+///	                                        ablech<-j
+	                                }
+				}
+			}
+*/
 		}()
 	}
 	wg.Wait()
 	t1 := time.Now()
         elapsed1 := t1.Sub(start)
         fmt.Printf("Time elapsed1: %v\n",elapsed1)
-	for l := 1; l <= numThreads; l++ {
+/*	for l := 1; l <= numThreads; l++ {
 		select {
 			case _ = <-ablech:
 				able = able + 1
@@ -81,6 +104,7 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 		//		fmt.Printf("######## No response for transaction: %d\n", indn)
 		}
 	}
+*/
         t2 := time.Now()
         elapsed2 := t2.Sub(start)
         fmt.Printf("Time elapsed2: %v\n",elapsed2)
