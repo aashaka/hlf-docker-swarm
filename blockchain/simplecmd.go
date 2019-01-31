@@ -4,13 +4,35 @@ import (
 	"fmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
 	"time"
-	"math"
+//	"math"
 	"math/rand"
 	"strconv"
 	"sync"
 )
-var load = 200
+var load = 1000
 var numThreads = 48
+var wg sync.WaitGroup
+
+type pair struct {
+	key string
+	value string
+}
+
+func worker(id int, jobs <-chan pair, results chan<- int, args []string, setup *FabricSetup) {
+	wg.Add(1)
+	defer wg.Done()
+	for j := range jobs {
+		fmt.Println("worker", id, "started  job", j.key)
+		_, err := setup.clients[id].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(j.key), []byte(j.value)}})
+		fmt.Println("worker", id, "finished job", j)
+		if err != nil {
+			results <- 0
+		} else {
+			results <- 1
+		}
+	}
+}
+
 // InvokeOpen
 func (setup *FabricSetup) InvokeOpen(account string, value string) (string, error) {
 
@@ -34,81 +56,53 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 //	defer setup.event.Unregister(reg)
 	var randNum1 []string
 	var randNum2 []string
+	var flag int
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
-	for k:=0; k<load; k++ {
+	for k:=0; k<load; {
+		flag = 1
 		num := strconv.Itoa(r1.Intn(10000000))
 		num2 := strconv.Itoa(r1.Intn(100))
-		randNum1 = append(randNum1,num)
-		randNum2 = append(randNum2,num2)
+		for _, ele := range randNum1 {
+			if ele == num {
+				flag=0
+			}
+		}
+		if flag == 1 {
+			randNum1 = append(randNum1,num)
+			k++
+			randNum2 = append(randNum2,num2)
+		}
 	}
-///	resch := make(chan channel.Response, load+4)
-///	errch := make(chan error, load+4)
-	var able int
-	var unable int
-	var wg sync.WaitGroup
+	jobs := make(chan pair, load)
+	results := make(chan int, load)
+	for ki:=0; ki<load; ki++ {
+		jobs <- pair{randNum1[ki],randNum2[ki]}
+	}
+
 	start := time.Now()
-///	ablech := make(chan int, load+4)
-///	unablech := make(chan int, load+4)
-	chunksz := load/numThreads
-	tx := 0
-	for i:=0; i<numThreads; i++ {
-		wg.Add(1)
-		j := i
-		go func() {
-			defer wg.Done()
-			for tx=j*chunksz; float64(tx)<math.Min(float64((j+1)*chunksz),float64(load)); tx++ {
-				// Create a request (proposal) and send it
-				fmt.Printf("Sending transaction %d via client %d\n",tx,j)
-//				fmt.Printf("%s: %s",randNum1[j], randNum2[j])
-				_, err := setup.clients[j].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(randNum1[tx]), []byte(randNum2[tx])}, TransientMap: transientDataMap})
-				if err != nil {
-///					errch<-fmt.Errorf("failed to open account: %v", err)
-///					unablech<-j
-				} else {
-	//				fmt.Printf("TXID: %v", response.TransactionID)
-///					resch<-response
-///					ablech<-j
-				}
-			}
-/*			if j == numThreads-1 {
-				for ; tx<load; tx++ {
-					// Create a request (proposal) and send it
-	                                fmt.Printf("Sending transaction %d via client %d",tx,j)
-	//                              fmt.Printf("%s: %s",randNum1[j], randNum2[j])
-	                                _, err := setup.clients[j].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(randNum1[tx]), []byte(randNum2[tx])}, TransientMap: transientDataMap})
-	                                if err != nil {
-///	                                        errch<-fmt.Errorf("failed to open account: %v", err)
-///	                                        unablech<-j
-	                                } else {
-	        //                              fmt.Printf("TXID: %v", response.TransactionID)
-///	                                        resch<-response
-///	                                        ablech<-j
-	                                }
-				}
-			}
-*/
-		}()
+
+	for w := 0; w < numThreads ; w++ {
+		go worker(w, jobs, results, args, setup)
 	}
+
+	close(jobs)
+
 	wg.Wait()
 	t1 := time.Now()
         elapsed1 := t1.Sub(start)
         fmt.Printf("Time elapsed1: %v\n",elapsed1)
-/*	for l := 1; l <= numThreads; l++ {
-		select {
-			case _ = <-ablech:
-				able = able + 1
-		//		fmt.Printf("######## Received response for transaction: %d\n", ind)
-			case _ = <-unablech:
-				unable = unable + 1
-		//		fmt.Printf("######## No response for transaction: %d\n", indn)
-		}
+	success:=0
+	var res int
+	for l := 1; l <= load; l++ {
+		res = <-results
+		success = success + res
 	}
-*/
+
         t2 := time.Now()
         elapsed2 := t2.Sub(start)
         fmt.Printf("Time elapsed2: %v\n",elapsed2)
-        fmt.Printf(" Able: %d\n Unable: %d\n",able, unable)
+        fmt.Printf(" Able: %d\n Unable: %d\n",success, load-success)
 // 	// Wait for the result of the submission
 // 	select {
 // 	case ccEvent := <-notifier:
