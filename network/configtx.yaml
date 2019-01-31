@@ -20,7 +20,7 @@ Orderer: &OrdererDefaults
     Addresses:
         - orderer0.example.com:7050
 
-    BatchTimeout: 4s
+    BatchTimeout: 400s
     BatchSize:
         MaxMessageCount: 1000000
         AbsoluteMaxBytes: 99 MB
