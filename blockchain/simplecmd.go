@@ -22,14 +22,17 @@ func worker(id int, jobs <-chan pair, results chan<- int, args []string, setup *
 	wg.Add(1)
 	defer wg.Done()
 	for j := range jobs {
-		fmt.Println("worker", id, "started  job", j.key)
-		_, err := setup.clients[id].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(j.key), []byte(j.value)}})
-		fmt.Println("worker", id, "finished job", j)
-		if err != nil {
-			results <- 0
-		} else {
-			results <- 1
-		}
+		go func(k pair){
+			fmt.Println("worker", id, "started  job", k.key)
+			_, err := setup.clients[id].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(k.key), []byte(k.value)}})
+			fmt.Println("worker", id, "finished job", j)
+			if err != nil {
+				results <- 0
+			} else {
+				results <- 1
+			}
+		}(j)
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 
