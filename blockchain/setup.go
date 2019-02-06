@@ -38,6 +38,51 @@ type FabricSetup struct {
 }
 
 // Initialize reads the configuration file and sets up the client, chain and event hub
+func (setup *FabricSetup) Continue() error {
+        // Add parameters for the initialization
+        if setup.initialized {
+                return errors.New("sdk already initialized")
+        }
+
+        // Initialize the SDK with the configuration file
+        sdk, err := fabsdk.New(config.FromFile(setup.ConfigFile))
+        if err != nil {
+                return errors.WithMessage(err, "failed to create SDK")
+        }
+        setup.sdk = sdk
+        fmt.Println("SDK created")
+
+        // The resource management client is responsible for managing channels (create/update channel)
+        resourceManagerClientContext := setup.sdk.Context(fabsdk.WithUser(setup.OrgAdmin), fabsdk.WithOrg(setup.OrgName))
+        if err != nil {
+                return errors.WithMessage(err, "failed to load Admin identity")
+        }
+        resMgmtClient, err := resmgmt.New(resourceManagerClientContext)
+        if err != nil {
+                return errors.WithMessage(err, "failed to create channel management client from Admin identity")
+        }
+        setup.admin = resMgmtClient
+        fmt.Println("Ressource management client created")
+
+        // Channel client is used to query and execute transactions
+        clientContext := setup.sdk.ChannelContext(setup.ChannelID, fabsdk.WithUser(setup.UserName))
+        for i:=0 ; i<numClients; i++ {
+                cli, err := channel.New(clientContext)
+                if err != nil {
+                        return errors.WithMessage(err, "failed to create new channel client")
+                }
+                setup.clients = append(setup.clients, cli)
+                fmt.Printf("Channel client %d created", i)
+        }
+        // Creation of the client which will enables access to our channel events
+        setup.event, err = event.New(clientContext)
+        if err != nil {
+                return errors.WithMessage(err, "failed to create new event client")
+        }
+        fmt.Println("Event client created")
+	return nil
+
+}
 func (setup *FabricSetup) Initialize() error {
 
 	// Add parameters for the initialization
