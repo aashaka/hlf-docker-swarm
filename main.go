@@ -118,6 +118,7 @@ func main() {
 		// web.Serve(app)
 	} else if (os.Args[1]=="1") {
 				err := fSetup.Continue()
+				fmt.Printf("\n Opening accounts soon:\n")
                                 txId, err := fSetup.InvokeOpen("Alice", "100")
                                 if err != nil {
                                         fmt.Printf("Unable to open account on the chaincode: %v\n", err)
@@ -134,7 +135,40 @@ func main() {
                                         fmt.Printf("Response from the invoke transfer, transaction ID: %s\n", txId)
         //                              able = able + 1
                                 }
-	} else {
-		fmt.Println("0 or 1 for now")
+	} else if (os.Args[1] == "warm") {
+		err := fSetup.Continue()
+		fmt.Println("Warming up")
+
+		txId, err := fSetup.OpenAccounts(0, 100000)
+                if err != nil {
+			fmt.Printf("Unable to open account on the chaincode: %v\n", err)
+        //                              unable = unable + 1
+                                } else {
+                                        fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
+        //                              able = able + 1
+                                }
+	} else if (os.Args[1] == "open") {
+				err := fSetup.Continue()
+				fmt.Println("Opening accounts")
+                                txId, err := fSetup.OpenAccounts(10001, 1000000)
+                                if err != nil {
+                                        fmt.Printf("Unable to open account on the chaincode: %v\n", err)
+        //                              unable = unable + 1
+                                } else {
+                                        fmt.Printf("Response from the invoke open, transaction ID: %s\n", txId)
+        //                              able = able + 1
+                                }
+
+	} else if (os.Args[1] == "transfer") {
+				err := fSetup.Continue()
+				fmt.Println("Transferring accounts")
+                                txId, err := fSetup.TransferAccounts(0, 1000000)
+                                if err != nil {
+                                        fmt.Printf("Unable to transfer on account on the chaincode: %v\n", err)
+        //                              unable = unable + 1
+                                } else {
+                                        fmt.Printf("Response from the transfer, transaction ID: %s\n", txId)
+        //                              able = able + 1
+                                }
 	}
 }

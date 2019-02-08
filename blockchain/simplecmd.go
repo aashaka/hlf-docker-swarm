@@ -1,15 +1,18 @@
 package blockchain
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+	"io/ioutil"
 	"time"
 //	"math"
 	"math/rand"
+	"os"
 	"strconv"
 	"sync"
 )
-var load = 100000
+var load = 50000
 var tload = 10000
 var numThreads = 48
 var wg sync.WaitGroup
@@ -33,7 +36,7 @@ func worker(id int, jobs <-chan pair, results chan<- int, args []string, setup *
 	defer wg.Done()
 	for j := range jobs {
 		go func(k pair){
-			fmt.Println("worker", id, "started  job", k.key)
+			fmt.Println("open worker", id, "started  job", k.key, " at ", time.Now())
 			_, err := setup.clients[id].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(k.key), []byte(k.value)}})
 			fmt.Println("worker", id, "finished job", j)
 			if err != nil {
@@ -52,7 +55,7 @@ func tworker(id int, tjobs <-chan triplet, tresults chan<- int, args []string, s
         defer wg.Done()
         for j := range tjobs {
                 go func(k triplet){
-                        fmt.Println("worker", id, "started  job", k.from, " -> ", k.to)
+                        fmt.Println("transfer worker", id, "started  job", k.from, " -> ", k.to, " at ", time.Now())
                         _, err := setup.clients[id].Execute(channel.Request{ChaincodeID: setup.ChainCodeID, Fcn: args[0], Args: [][]byte{[]byte(args[1]), []byte(k.from), []byte(k.to), []byte(k.value)}})
                         fmt.Println("worker", id, "finished job", j)
                         if err != nil {
@@ -65,10 +68,150 @@ func tworker(id int, tjobs <-chan triplet, tresults chan<- int, args []string, s
         }
 }
 
+func (setup *FabricSetup) OpenAccounts(startidx int, length int) (string, error) {
+        fmt.Println("Invoked Open")
+        // Prepare arguments
+        var args []string
+        args = append(args, "invoke")
+        args = append(args, "open")
+
+        jsonFile, err := os.Open("state.json")
+        if err != nil {
+                fmt.Println(err)
+        }
+        fmt.Println("Successfully Opened state.json")
+        defer jsonFile.Close()
+
+        var acs []string
+
+        var result map[string]interface{}
+        byteValue, _ := ioutil.ReadAll(jsonFile)
+        json.Unmarshal([]byte(byteValue), &result)
+
+        accounts := result["accounts"].(map[string]interface{})
+        for key, _ := range accounts {
+
+                // Each value is an interface{} type, that is type asserted as a string
+                acs=append(acs,key)
+
+        }
+
+        jobs := make(chan pair, length)
+        results := make(chan int, length)
+        for ki:=startidx; ki<startidx+length; ki++ {
+                jobs <- pair{acs[ki],"1000"}
+        }
+
+        start := time.Now()
+	fmt.Println("", time.Now(), ": Starting account creation")
+        for w := 0; w < numThreads ; w++ {
+                go worker(w, jobs, results, args, setup)
+        }
+	wg.Wait()
+        close(jobs)
+	fmt.Println("", time.Now(), ": Done opening accounts")
+
+        t1 := time.Now()
+        elapsed1 := t1.Sub(start)
+        fmt.Printf("Time elapsed1: %v\n",elapsed1)
+        success:=0
+        var res int
+        for l := 1; l <= length; l++ {
+                res = <-results
+                success = success + res
+        }
+
+        t2 := time.Now()
+        elapsed2 := t2.Sub(start)
+        fmt.Printf("Time elapsed2: %v\n",elapsed2)
+        fmt.Printf(" Able: %d\n Unable: %d\n",success, load-success)
+
+
+
+	return "", nil
+}
+
+
+
+func (setup *FabricSetup) TransferAccounts(startidx int, length int) (string, error) {
+        fmt.Println("Invoked Open")
+        // Prepare arguments
+        var args []string
+        args = append(args, "invoke")
+        args = append(args, "transfer")
+
+
+
+        jsonFile, err := os.Open("state.json")
+        if err != nil {
+                fmt.Println(err)
+        }
+        fmt.Println("Successfully Opened state.json")
+        defer jsonFile.Close()
+
+        var acs []string
+
+        var result map[string]interface{}
+        byteValue, _ := ioutil.ReadAll(jsonFile)
+        json.Unmarshal([]byte(byteValue), &result)
+
+        accounts := result["accounts"].(map[string]interface{})
+        for key, _ := range accounts {
+
+                // Each value is an interface{} type, that is type asserted as a string
+                acs=append(acs,key)
+
+        }
+
+
+	var from_el []string
+	var to_el []string
+
+	for k:=startidx; k<length*2; k=k+2 {
+		from_el = append(from_el, acs[k])
+		to_el = append(to_el,acs[k+1])
+	}
+
+
+	tjobs := make(chan triplet, length)
+	tresults := make(chan int, length)
+	for ki:=0; ki<length; ki++ {
+		tjobs <- triplet{from_el[ki],to_el[ki],"100"}
+	}
+
+	start := time.Now()
+
+	fmt.Println(time.Now(), ": Starting transfer tx")
+	for w := 0; w < numThreads ; w++ {
+		go tworker(w, tjobs, tresults, args, setup)
+	}
+
+	close(tjobs)
+
+	wg.Wait()
+	fmt.Println(time.Now(), ": Transfers finished")
+        t1 := time.Now()
+        elapsed1 := t1.Sub(start)
+        fmt.Printf("Time elapsed1: %v\n",elapsed1)
+        success:=0
+        var res int
+        for l := 1; l <= length; l++ {
+                res = <-tresults
+                success = success + res
+        }
+
+        t2 := time.Now()
+        elapsed2 := t2.Sub(start)
+        fmt.Printf("Time elapsed2: %v\n",elapsed2)
+        fmt.Printf(" Able: %d\n Unable: %d\n",success, tload-success)
+
+	return "", nil
+}
 
 // InvokeOpen
 func (setup *FabricSetup) InvokeOpen(account string, value string) (string, error) {
 
+	fmt.Println("Invoked Open")
 	// Prepare arguments
 	var args []string
 	args = append(args, "invoke")
@@ -79,8 +222,6 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 //	eventID := "eventOpen"
 
 	// Add data that will be visible in the proposal, like a description of the invoke request
-	transientDataMap := make(map[string][]byte)
-	transientDataMap["result"] = []byte("Transient data in open")
 
 // 	reg, notifier, err := setup.event.RegisterChaincodeEvent(setup.ChainCodeID, eventID)
 // 	if err != nil {
@@ -96,6 +237,7 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 		flag = 1
 		num := strconv.Itoa(r1.Intn(10000000))
 		num2 := strconv.Itoa(10000 + r1.Intn(100))
+//		fmt.Printf("num1: %d, k: %d\n", num, k)
 		for _, ele := range randNum1 {
 			if ele == num {
 				flag=0
@@ -107,9 +249,11 @@ func (setup *FabricSetup) InvokeOpen(account string, value string) (string, erro
 			randNum2 = append(randNum2,num2)
 		}
 	}
+	fmt.Println("Load is ",load)
 	jobs := make(chan pair, load)
 	results := make(chan int, load)
 	for ki:=0; ki<load; ki++ {
+//		fmt.Println("Got key", ki)
 		jobs <- pair{randNum1[ki],randNum2[ki]}
 	}
 
@@ -190,18 +334,18 @@ func (setup *FabricSetup) InvokeTransfer(sender string, receiver string, value s
 
 	var from_el []string
 	var to_el []string
-	s1 := rand.NewSource(time.Now().UnixNano())
-        r1 := rand.New(s1)
-	for k:=0; k<tload; k++ {
-		from_el = append(from_el, randNum1[r1.Intn(load)])
-		to_el = append(to_el,randNum1[r1.Intn(load)])
+	//s1 := rand.NewSource(time.Now().UnixNano())
+        //r1 := rand.New(s1)
+	for k:=0; k<tload*2; k=k+2 {
+		from_el = append(from_el, randNum1[k])
+		to_el = append(to_el,randNum1[k+1])
 	}
 
 
 	tjobs := make(chan triplet, tload)
 	tresults := make(chan int, tload)
 	for ki:=0; ki<tload; ki++ {
-		tjobs <- triplet{from_el[ki],to_el[ki],"1"}
+		tjobs <- triplet{from_el[ki],to_el[ki],"100"}
 	}
 
 	start := time.Now()

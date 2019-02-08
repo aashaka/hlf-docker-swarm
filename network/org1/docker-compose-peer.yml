@@ -136,1411 +136,1411 @@ services:
             aliases:
                 - peer1.org1.example.com
 
-    peer2_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer1
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer2.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer2.org1.example.com
-            - CORE_PEER_ADDRESS=peer2.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 7251:7051
-            - 7253:7053
-        networks:
-          skcript:
-            aliases:
-                - peer2.org1.example.com
-
-    peer3_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer1
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer3.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer3.org1.example.com
-            - CORE_PEER_ADDRESS=peer3.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer3.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 7351:7051
-          - 7353:7053
-        networks:
-          skcript:
-            aliases:
-                - peer3.org1.example.com
-
-    peer4_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer2
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer4.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer4.org1.example.com
-            - CORE_PEER_ADDRESS=peer4.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer4.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer4.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer4.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 7451:7051
-            - 7453:7053
-        networks:
-          skcript:
-            aliases:
-                - peer4.org1.example.com
-
-    peer5_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer2
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer5.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer5.org1.example.com
-            - CORE_PEER_ADDRESS=peer5.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer5.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer5.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer5.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8551:7051
-          - 8553:7053
-        networks:
-          skcript:
-            aliases:
-                - peer5.org1.example.com
-
-    peer6_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer2
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer6.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer6.org1.example.com
-            - CORE_PEER_ADDRESS=peer6.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer6.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer6.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer6.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 7651:7051
-            - 7653:7053
-        networks:
-          skcript:
-            aliases:
-                - peer6.org1.example.com
-
-    peer7_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer2
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer7.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer7.org1.example.com
-            - CORE_PEER_ADDRESS=peer7.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer7.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer7.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer7.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8751:7051
-          - 8753:7053
-        networks:
-          skcript:
-            aliases:
-                - peer7.org1.example.com
-
-    peer8_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer3
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer8.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer8.org1.example.com
-            - CORE_PEER_ADDRESS=peer8.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer8.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer8.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer8.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 7851:7051
-            - 7853:7053
-        networks:
-          skcript:
-            aliases:
-                - peer8.org1.example.com
-
-    peer9_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer3
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer9.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer9.org1.example.com
-            - CORE_PEER_ADDRESS=peer9.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer9.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer9.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer9.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 7951:7051
-          - 7953:7053
-        networks:
-          skcript:
-            aliases:
-                - peer9.org1.example.com
-
-    peer10_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer3
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer10.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer10.org1.example.com
-            - CORE_PEER_ADDRESS=peer10.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer10.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer10.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer10.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 8051:7051
-            - 8053:7053
-        networks:
-          skcript:
-            aliases:
-                - peer10.org1.example.com
-
-    peer11_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer3
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer11.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer11.org1.example.com
-            - CORE_PEER_ADDRESS=peer11.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer11.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer11.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer11.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8151:7051
-          - 8153:7053
-        networks:
-          skcript:
-            aliases:
-                - peer11.org1.example.com
-
-    peer12_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer4
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer12.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer12.org1.example.com
-            - CORE_PEER_ADDRESS=peer12.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer12.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer12.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer12.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 8251:7051
-            - 8253:7053
-        networks:
-          skcript:
-            aliases:
-                - peer12.org1.example.com
-
-    peer13_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer4
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer13.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer13.org1.example.com
-            - CORE_PEER_ADDRESS=peer13.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer13.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer13.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer13.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8351:7051
-          - 8353:7053
-        networks:
-          skcript:
-            aliases:
-                - peer13.org1.example.com
-
-    peer14_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer4
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer14.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer14.org1.example.com
-            - CORE_PEER_ADDRESS=peer14.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer14.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer14.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer14.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 8451:7051
-            - 8453:7053
-        networks:
-          skcript:
-            aliases:
-                - peer14.org1.example.com
-
-    peer15_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer4
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer15.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer15.org1.example.com
-            - CORE_PEER_ADDRESS=peer15.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer15.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer15.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer15.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8551:7051
-          - 8553:7053
-        networks:
-          skcript:
-            aliases:
-                - peer15.org1.example.com
-
-    peer16_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer5
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer16.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer16.org1.example.com
-            - CORE_PEER_ADDRESS=peer16.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer16.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer16.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer16.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 8651:7051
-            - 8653:7053
-        networks:
-          skcript:
-            aliases:
-                - peer16.org1.example.com
-
-    peer17_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer5
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer1.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer17.org1.example.com
-            - CORE_PEER_ADDRESS=peer17.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer17.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer17.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer17.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8751:7051
-          - 8753:7053
-        networks:
-          skcript:
-            aliases:
-                - peer17.org1.example.com
-
-
-    peer18_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer5
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer18.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer18.org1.example.com
-            - CORE_PEER_ADDRESS=peer18.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer18.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer18.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer18.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 8851:7051
-            - 8853:7053
-        networks:
-          skcript:
-            aliases:
-                - peer18.org1.example.com
-
-    peer19_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer5
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer19.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer19.org1.example.com
-            - CORE_PEER_ADDRESS=peer19.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer19.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer19.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer19.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 8951:7051
-          - 8953:7053
-        networks:
-          skcript:
-            aliases:
-                - peer19.org1.example.com
-
-    peer20_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer6
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer20.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer20.org1.example.com
-            - CORE_PEER_ADDRESS=peer20.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer20.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer20.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer20.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 9051:7051
-            - 9053:7053
-        networks:
-          skcript:
-            aliases:
-                - peer20.org1.example.com
-
-    peer21_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer6
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer21.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer21.org1.example.com
-            - CORE_PEER_ADDRESS=peer21.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer21.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer21.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer21.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 9151:7051
-          - 9153:7053
-        networks:
-          skcript:
-            aliases:
-                - peer21.org1.example.com
-
-    peer22_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer6
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer22.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer22.org1.example.com
-            - CORE_PEER_ADDRESS=peer22.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer22.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer22.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer22.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb0_org1
-            - orderer_org1
-        ports:
-            - 9251:7051
-            - 9253:7053
-        networks:
-          skcript:
-            aliases:
-                - peer22.org1.example.com
-
-    peer23_org1:
-        deploy:
-            replicas: 1
-            restart_policy:
-                condition: on-failure
-                delay: 5s
-                max_attempts: 3
-            placement:
-                constraints:
-                    - node.hostname == peer6
-        image: hyperledger/fabric-peer:amd64-latest
-        hostname: peer23.org1.example.com
-        environment:
-            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - CORE_PEER_NETWORKID=skcript
-            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
-            # - CORE_PEER_ADDRESSAUTODETECT=true
-            # - CORE_PEER_GOSSIP_ORGLEADER=false
-            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
-            - CORE_PEER_PROFILE_ENABLED=true
-            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
-#            - CORE_LOGGING_LEVEL=DEBUG
-            - FABRIC_LOGGING_SPEC=DEBUG
-            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
-            - CORE_LOGGING_MSP=DEBUG
-            - CORE_VM_DOCKER_ATTACHSTDOUT=true
-            - CORE_CHAINCODE_LOGGING_LEVEL=debug
-            - CORE_CHAINCODE_LOGGING_SHIM=debug
-            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
-            # TLS settings
-            - CORE_PEER_TLS_ENABLED=true
-            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
-            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
-            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_ID=peer23.org1.example.com
-            - CORE_PEER_ADDRESS=peer23.org1.example.com:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer23.org1.example.com:7051
-            - CORE_PEER_LOCALMSPID=Org1MSP
-            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
-        volumes:
-            - /var/run/:/host/var/run/
-            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-            # - ../crypto-config/:/var/hyperledger/config
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer23.org1.example.com/msp:/var/hyperledger/msp
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer23.org1.example.com/tls:/var/hyperledger/tls
-            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
-            - /var/mynetwork/certs/config/:/var/hyperledger/config
-        command: peer node start
-        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-        depends_on:
-            # - couchdb1_org1
-            - orderer_org1
-        ports:
-          - 9351:7051
-          - 9353:7053
-        networks:
-          skcript:
-            aliases:
-                - peer23.org1.example.com
+#    peer2_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer1
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer2.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer2.org1.example.com
+#            - CORE_PEER_ADDRESS=peer2.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer2.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 7251:7051
+#            - 7253:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer2.org1.example.com
+#
+#    peer3_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer1
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer3.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer3.org1.example.com
+#            - CORE_PEER_ADDRESS=peer3.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer3.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer3.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 7351:7051
+#          - 7353:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer3.org1.example.com
+#
+#    peer4_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer2
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer4.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer4.org1.example.com
+#            - CORE_PEER_ADDRESS=peer4.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer4.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer4.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer4.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 7451:7051
+#            - 7453:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer4.org1.example.com
+#
+#    peer5_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer2
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer5.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer5.org1.example.com
+#            - CORE_PEER_ADDRESS=peer5.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer5.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer5.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer5.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8551:7051
+#          - 8553:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer5.org1.example.com
+#
+#    peer6_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer2
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer6.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer6.org1.example.com
+#            - CORE_PEER_ADDRESS=peer6.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer6.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer6.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer6.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 7651:7051
+#            - 7653:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer6.org1.example.com
+#
+#    peer7_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer2
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer7.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer7.org1.example.com
+#            - CORE_PEER_ADDRESS=peer7.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer7.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer7.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer7.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8751:7051
+#          - 8753:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer7.org1.example.com
+#
+#    peer8_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer3
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer8.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer8.org1.example.com
+#            - CORE_PEER_ADDRESS=peer8.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer8.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer8.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer8.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 7851:7051
+#            - 7853:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer8.org1.example.com
+#
+#    peer9_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer3
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer9.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer9.org1.example.com
+#            - CORE_PEER_ADDRESS=peer9.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer9.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer9.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer9.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 7951:7051
+#          - 7953:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer9.org1.example.com
+#
+#    peer10_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer3
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer10.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer10.org1.example.com
+#            - CORE_PEER_ADDRESS=peer10.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer10.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer10.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer10.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 8051:7051
+#            - 8053:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer10.org1.example.com
+#
+#    peer11_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer3
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer11.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer11.org1.example.com
+#            - CORE_PEER_ADDRESS=peer11.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer11.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer11.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer11.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8151:7051
+#          - 8153:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer11.org1.example.com
+#
+#    peer12_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer4
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer12.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer12.org1.example.com
+#            - CORE_PEER_ADDRESS=peer12.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer12.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer12.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer12.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 8251:7051
+#            - 8253:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer12.org1.example.com
+#
+#    peer13_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer4
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer13.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer13.org1.example.com
+#            - CORE_PEER_ADDRESS=peer13.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer13.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer13.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer13.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8351:7051
+#          - 8353:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer13.org1.example.com
+#
+#    peer14_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer4
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer14.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer14.org1.example.com
+#            - CORE_PEER_ADDRESS=peer14.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer14.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer14.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer14.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 8451:7051
+#            - 8453:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer14.org1.example.com
+#
+#    peer15_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer4
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer15.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer15.org1.example.com
+#            - CORE_PEER_ADDRESS=peer15.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer15.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer15.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer15.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8551:7051
+#          - 8553:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer15.org1.example.com
+#
+#    peer16_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer5
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer16.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer16.org1.example.com
+#            - CORE_PEER_ADDRESS=peer16.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer16.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer16.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer16.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 8651:7051
+#            - 8653:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer16.org1.example.com
+#
+#    peer17_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer5
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer1.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer17.org1.example.com
+#            - CORE_PEER_ADDRESS=peer17.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer17.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer17.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer17.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8751:7051
+#          - 8753:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer17.org1.example.com
+#
+#
+#    peer18_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer5
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer18.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer18.org1.example.com
+#            - CORE_PEER_ADDRESS=peer18.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer18.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer18.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer18.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 8851:7051
+#            - 8853:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer18.org1.example.com
+#
+#    peer19_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer5
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer19.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer19.org1.example.com
+#            - CORE_PEER_ADDRESS=peer19.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer19.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer19.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer19.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 8951:7051
+#          - 8953:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer19.org1.example.com
+#
+#    peer20_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer6
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer20.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer20.org1.example.com
+#            - CORE_PEER_ADDRESS=peer20.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer20.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer20.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer20.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 9051:7051
+#            - 9053:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer20.org1.example.com
+#
+#    peer21_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer6
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer21.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer21.org1.example.com
+#            - CORE_PEER_ADDRESS=peer21.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer21.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer21.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer21.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 9151:7051
+#          - 9153:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer21.org1.example.com
+#
+#    peer22_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer6
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer22.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer22.org1.example.com
+#            - CORE_PEER_ADDRESS=peer22.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer22.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer22.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer22.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb0_org1
+#            - orderer_org1
+#        ports:
+#            - 9251:7051
+#            - 9253:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer22.org1.example.com
+#
+#    peer23_org1:
+#        deploy:
+#            replicas: 1
+#            restart_policy:
+#                condition: on-failure
+#                delay: 5s
+#                max_attempts: 3
+#            placement:
+#                constraints:
+#                    - node.hostname == peer6
+#        image: hyperledger/fabric-peer:amd64-latest
+#        hostname: peer23.org1.example.com
+#        environment:
+#            - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+#            - CORE_PEER_NETWORKID=skcript
+#            - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=skcript
+#            # - CORE_PEER_ADDRESSAUTODETECT=true
+#            # - CORE_PEER_GOSSIP_ORGLEADER=false
+#            # - CORE_PEER_GOSSIP_USELEADERELECTION=true
+#            - CORE_PEER_PROFILE_ENABLED=true
+#            # - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            #- CORE_LEDGER_STATE_STATEDATABASE=LevelDB
+##            - CORE_LOGGING_LEVEL=DEBUG
+#            - FABRIC_LOGGING_SPEC=DEBUG
+#            - CORE_LOGGING_GOSSIP=${CORE_LOGGING_GOSSIP}
+#            - CORE_LOGGING_MSP=DEBUG
+#            - CORE_VM_DOCKER_ATTACHSTDOUT=true
+#            - CORE_CHAINCODE_LOGGING_LEVEL=debug
+#            - CORE_CHAINCODE_LOGGING_SHIM=debug
+#            - CORE_PEER_MSPCONFIGPATH=/var/hyperledger/msp
+#            # TLS settings
+#            - CORE_PEER_TLS_ENABLED=true
+#            - CORE_PEER_TLS_CLIENTAUTHREQUIRED=false
+#            - CORE_PEER_TLS_CERT_FILE=/var/hyperledger/tls/server.crt
+#            - CORE_PEER_TLS_KEY_FILE=/var/hyperledger/tls/server.key
+#            - CORE_PEER_TLS_ROOTCERT_FILE=/var/hyperledger/tls/ca.crt
+#            - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+#            # - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+#            - CORE_PEER_ID=peer23.org1.example.com
+#            - CORE_PEER_ADDRESS=peer23.org1.example.com:7051
+#            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer23.org1.example.com:7051
+#            - CORE_PEER_LOCALMSPID=Org1MSP
+#            # - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+#            # - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1_org1:5984
+#        volumes:
+#            - /var/run/:/host/var/run/
+#            # - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
+#            # - ../crypto-config/:/var/hyperledger/config
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer23.org1.example.com/msp:/var/hyperledger/msp
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/peers/peer23.org1.example.com/tls:/var/hyperledger/tls
+#            - /var/mynetwork/certs/crypto-config/peerOrganizations/org1.example.com/users:/var/hyperledger/users
+#            - /var/mynetwork/certs/config/:/var/hyperledger/config
+#        command: peer node start
+#        working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+#        depends_on:
+#            # - couchdb1_org1
+#            - orderer_org1
+#        ports:
+#          - 9351:7051
+#          - 9353:7053
+#        networks:
+#          skcript:
+#            aliases:
+#                - peer23.org1.example.com
